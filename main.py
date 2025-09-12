@@ -1,4 +1,5 @@
 import cv2 # using opencv for image capturing
+from transformers import BlipProcessor
 
 # putting video file into object to be manipulated
 test = cv2.VideoCapture("TestFootage/carspassingby.mp4")
