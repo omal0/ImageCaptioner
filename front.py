@@ -7,7 +7,7 @@ root = tk.Tk()
 root.title("AI Image Captioner")
 root.geometry("500x400")
 
-label = tk.Label(root, text="")
+label = tk.Label(root, text="Please Input Video")
 label.pack(pady=20)
 
 button = tk.Button(root, text="Click me", command=on_button_click)

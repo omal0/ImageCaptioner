@@ -1,5 +1,6 @@
 import cv2 # using opencv for image capturing
-from transformers import BlipProcessor
+from PIL import Image
+from transformers import BlipProcessor, BlipForConditionalGeneration
 
 # putting video file into object to be manipulated
 test = cv2.VideoCapture("TestFootage/carspassingby.mp4")
@@ -18,3 +19,8 @@ if ret:
 
 # stop working with video
 test.release()
+
+# ---------------------------------
+
+# Testing with BLIP
+url = ""
