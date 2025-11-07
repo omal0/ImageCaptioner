@@ -21,11 +21,10 @@ root = tk.Tk()
 root.title("AI Image Recognizer")
 root.geometry("600x600")
 
-img_label = tk.Label(root)
-img_label.pack()
+root.configure(bg="#ECF0F1") # maybe remove 
 
-result_label = tk.Label(root, text="Upload an image or video to analyze.", wraplength=400)
-result_label.pack(pady=15)
+
+
 
 filename = None
 
@@ -60,7 +59,7 @@ def my_upload(): # show file browser and preview of photo
     elif ext in ("mp4", "mov", "avi", "mkv"):
         # --- Video thumbnail (extract first frame) ---
         cap = cv2.VideoCapture(filename)
-        frame_num = 1  # pick the 2th frame
+        frame_num = 1  # pick the 1st frame
         success = False
         for _ in range(frame_num):
             success, frame = cap.read()
@@ -96,22 +95,62 @@ def my_add():
  # code to store data in database
 
 
+style = ttk.Style()
+style.theme_use("clam")
 
-label = tk.Label(root, text="Please Input Video")
-label.pack(pady=20)
+# --- Button styles ---
+style.configure("Upload.TButton",
+                font=("Helvetica", 12, "bold"),
+                padding=8,
+                background="#3498DB",
+                foreground="white")
 
-#button = tk.Button(root, text="Click me", command=on_button_click)
-#button.pack()
+style.map("Upload.TButton",
+          background=[("active", "#2980B9")])
 
-b1=tk.Button(root,text='Upload',command=lambda:my_upload())
-b1.pack(side=tk.RIGHT, padx=10, pady=5)
+style.configure("Enter.TButton",
+                font=("Helvetica", 12, "bold"),
+                padding=8,
+                background="#2ECC71",
+                foreground="white")
 
-b2=tk.Button(root,text='Enter',command=lambda:my_add())
+style.map("Enter.TButton",
+          background=[("active", "#27AE60")])
 
-b2.pack(side=tk.LEFT, padx=10, pady=5)
+# --- Label styles ---
+style.configure("Header.TLabel",
+                font=("Helvetica", 18, "bold"),
+                background="#ECF0F1",
+                foreground="#2C3E50")
 
-result = tk.Label(root, text = 'The caption will go here')
-result.pack(side = tk.BOTTOM, padx = 20, pady = 15)
+style.configure("Result.TLabel",
+                font=("Helvetica", 12),
+                background="#ECF0F1",
+                foreground="#34495E")
+
+# --- UI Layout ---
+header = ttk.Label(root, text="AI Image & Video Analyzer", style="Header.TLabel")
+header.pack(pady=15)
+
+#img_label = tk.Label(root, bg="#BDC3C7", width=300, height=200)
+#img_label.pack(pady=10)
+
+result_label = ttk.Label(root, text="Upload an image or video to analyze.",
+                         style="Result.TLabel", wraplength=450)
+result_label.pack(pady=15)
+
+# Buttons grouped in a frame
+button_frame = tk.Frame(root, bg="#ECF0F1")
+button_frame.pack(pady=10)
+
+b1 = ttk.Button(button_frame, text="Upload", style="Upload.TButton", command=lambda: my_upload())
+b1.pack(side=tk.LEFT, padx=10)
+
+b2 = ttk.Button(button_frame, text="Analyze", style="Enter.TButton", command=lambda: my_add())
+b2.pack(side=tk.LEFT, padx=10)
+
+img_label = tk.Label(root)
+img_label.pack()
 
 global img
 
