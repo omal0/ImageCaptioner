@@ -28,10 +28,16 @@ processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base
 blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base")
 
 def describe_image(frame):
-    # Convert numpy frame -> PIL image
+    # Downscale before BLIP
     image = Image.fromarray(cv2.cvtColor(frame, cv2.COLOR_BGR2RGB))
-    inputs = processor(images=image, return_tensors="pt").to("cuda")
-    out = blip_model.generate(**inputs)
+    image = image.resize((384, 384))
+
+    inputs = processor(images=image, return_tensors="pt").to(device)
+    with torch.inference_mode():
+        out = blip_model.generate(
+            **inputs,
+            max_new_tokens=20
+        )
     caption = processor.decode(out[0], skip_special_tokens=True)
     return caption
 
@@ -51,17 +57,30 @@ else:
         results = yolomodel(frame, show=True)  # show=True opens a window with boxes 
 
         # Blip Captions for frame
-        full_frame_caption = describe_image(frame)
-        print(full_frame_caption)
+        if frame_num % 10 == 0:
+            full_frame_caption = describe_image(frame)
+            print(f"Frame {frame_num}: {full_frame_caption}")
 
         for result in results:
-
             boxes = result.boxes
 
             for box in boxes:
-               print(f"Class: {model.keypoints[int(box.cls)]}, "
-               f"Conf: {float(box.conf):.2f}, "
-               f"Box: {box.xyxy.tolist()}")
+                cls_id = int(box.cls)
+                conf = float(box.conf)
+                bbox = box.xyxy.tolist()
+                cls_name = yolomodel.names[cls_id]  # class name from YOLO model
+
+        print(f"Class: {cls_name}, Conf: {conf:.2f}, Box: {bbox}")
+
+
+        # for result in results:
+
+        #     boxes = result.boxes
+
+        #     for box in boxes:
+        #        print(f"Class: {model.keypoints[int(box.cls)]}, "
+        #        f"Conf: {float(box.conf):.2f}, "
+        #        f"Box: {box.xyxy.tolist()}")
 
     cap.release()
     cv2.destroyAllWindows()
