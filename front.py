@@ -7,23 +7,19 @@ import os
 import shutil
 import cv2
 
+import sys 
+import threading
 
 
 INPUT_FOLDER = "shared_input"
 UPLOAD_STACK = []  # This will behave like a stack
 os.makedirs(INPUT_FOLDER, exist_ok=True)
 
-
-def on_button_click():
-    label.config(text="Hello!")
-
 root = tk.Tk()
 root.title("AI Image Recognizer")
 root.geometry("600x600")
 
 root.configure(bg="#ECF0F1") # maybe remove 
-
-
 
 
 filename = None
@@ -80,19 +76,11 @@ def my_upload(): # show file browser and preview of photo
         img_label.config(text="Unsupported file type", image="")
 
 def my_add():
-    """Check if backend has processed the file"""
-    output_path = os.path.join(INPUT_FOLDER, "result.json")
-    if not os.path.exists(output_path):
-        result_label.config(text="Waiting for backend to process...")
-        root.after(2000, my_add)  # check again after 2s
-    else:
-        with open(output_path, "r") as f:
-            data = json.load(f)
-        caption = data.get("caption", "No caption found.")
-        detections = data.get("detections", "No detections found.")
-        result_label.config(text=f"Caption: {caption}\nDetections: {detections}")
-        os.remove(output_path)  # clear old results
- # code to store data in database
+    result_label.config(text="Analyzing... (click 'Upload to use again)")
+
+    os.system('python back.py')
+
+
 
 
 style = ttk.Style()
@@ -132,9 +120,6 @@ style.configure("Result.TLabel",
 header = ttk.Label(root, text="AI Image & Video Analyzer", style="Header.TLabel")
 header.pack(pady=15)
 
-#img_label = tk.Label(root, bg="#BDC3C7", width=300, height=200)
-#img_label.pack(pady=10)
-
 result_label = ttk.Label(root, text="Upload an image or video to analyze.",
                          style="Result.TLabel", wraplength=450)
 result_label.pack(pady=15)
@@ -155,4 +140,5 @@ img_label.pack()
 global img
 
 root.mainloop()
+
 
