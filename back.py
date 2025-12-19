@@ -8,6 +8,29 @@ from PIL import Image
 from transformers import BlipForConditionalGeneration, BlipProcessor
 import cv2
 
+import os
+
+INPUT_FOLDER = "shared_input"
+
+os.makedirs(INPUT_FOLDER, exist_ok=True)
+
+
+
+
+def get_latest_upload():
+    files = [os.path.join(INPUT_FOLDER, f) for f in os.listdir(INPUT_FOLDER)]
+    if not files:
+        return None
+    # Sort by modification time, latest last
+    latest_file = max(files, key=os.path.getmtime)
+    return latest_file
+
+latest = get_latest_upload()
+
+
+
+
+
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {device}")
 
@@ -17,10 +40,12 @@ if device == "cuda":
 elif device == "cpu":
     yolomodel = YOLO("model/yolo11n.pt").to(device)
 
+results = yolomodel(latest, show=True)  # show=True opens a window with boxes
+
 # Run prediction on an image
 # results = yolomodel("TestFootage/carspassingby.mp4", show=True)  # show=True opens a window with boxes
-video_path = "TestFootage/carspassingby.mp4"
-cap = cv2.VideoCapture(video_path)
+#video_path = "TestFootage/carspassingby.mp4"
+cap = cv2.VideoCapture(results)
 frame_num = 0
 
 # Blip Processing
@@ -85,17 +110,17 @@ else:
     cap.release()
     cv2.destroyAllWindows()
 
-print("Done")
+print("Done")    
 
 
-# # Print detailed results
-# for result in results:
+    # # Print detailed results
+    # for result in results:
 
-#     boxes = result.boxes
-    
-#     # Drawing boxes on video
-#     for box in boxes:
+    #     boxes = result.boxes
+        
+    #     # Drawing boxes on video
+    #     for box in boxes:
 
-#         print(f"Class: {model.keypoints[int(box.cls)]}, "
-#               f"Conf: {float(box.conf):.2f}, "
-#               f"Box: {box.xyxy.tolist()}")
+    #         print(f"Class: {model.keypoints[int(box.cls)]}, "
+    #               f"Conf: {float(box.conf):.2f}, "
+    #               f"Box: {box.xyxy.tolist()}")
